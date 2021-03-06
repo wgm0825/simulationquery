@@ -1,0 +1,374 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: MySelector</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">com.example.simulationquerydemo.selector</a> ]
+</div>
+
+<h1>Coverage Summary for Class: MySelector (com.example.simulationquerydemo.selector)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">MySelector</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    7.7%
+  </span>
+  <span class="absValue">
+    (1/ 13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0.6%
+  </span>
+  <span class="absValue">
+    (1/ 154)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package com.example.simulationquerydemo.selector;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import com.alibaba.fastjson.JSONObject;
+<i>4</i>&nbsp;import com.example.simulationquerydemo.common.OperateType;
+<i>5</i>&nbsp;import com.example.simulationquerydemo.entity.ProductPO;
+<i>6</i>&nbsp;import com.example.simulationquerydemo.util.MyStringUtil;
+<i>7</i>&nbsp;import org.springframework.stereotype.Component;
+<i>8</i>&nbsp;
+<i>9</i>&nbsp;import java.util.*;
+<i>10</i>&nbsp;import java.util.function.Predicate;
+<i>11</i>&nbsp;import java.util.stream.Collectors;
+<i>12</i>&nbsp;import java.util.stream.Stream;
+<i>13</i>&nbsp;
+<i>14</i>&nbsp;/**
+<i>15</i>&nbsp; * 自定与排序实现
+<i>16</i>&nbsp; *
+<i>17</i>&nbsp; * @ProgramName: simulationquerydemo
+<i>18</i>&nbsp; * @ClassName: MySelector
+<i>19</i>&nbsp; * @Description: 自定义排序实现
+<i>20</i>&nbsp; * @Author: gm
+<i>21</i>&nbsp; * @Date: 2021/3/5 0005
+<i>22</i>&nbsp; * @Version: 1.0
+<i>23</i>&nbsp; */
+<i>24</i>&nbsp;@Component
+<b class="fc"><i>25</i>&nbsp;public class MySelector  {</b>
+<i>26</i>&nbsp;
+<i>27</i>&nbsp;    /**
+<i>28</i>&nbsp;     *
+<i>29</i>&nbsp;     * @param dataList 待筛选查询的数据集合（这里假设用商品信息模拟全量数据集合）
+<i>30</i>&nbsp;     * @param filterAndMap 筛选过滤”与“条件，key值传运算符（主要实现了以下几种：equals,contains,startsWith），value值传对应数据对象条件
+<i>31</i>&nbsp;     * @param filterOrMap 筛选过滤”或“条件，key值传运算符（主要实现了以下几种：equals,contains,startsWith），value值传对应数据对象条件
+<i>32</i>&nbsp;     * @param sortAndGroupMap 排序分组对象，key值传ASC,DESC,GROUP，value值传对应数据对象条件
+<i>33</i>&nbsp;     * @param limit 分页数量
+<i>34</i>&nbsp;     * @return
+<i>35</i>&nbsp;     */
+<i>36</i>&nbsp;    public String query(List&lt;ProductPO&gt; dataList, Map&lt;String,ProductPO&gt; filterAndMap,
+<i>37</i>&nbsp;                                 Map&lt;String,ProductPO&gt; filterOrMap,Map&lt;String,ProductPO&gt; sortAndGroupMap,int limit) {
+<b class="nc"><i>38</i>&nbsp;        Stream&lt;ProductPO&gt; stream = dataList.stream();</b>
+<i>39</i>&nbsp;
+<b class="nc"><i>40</i>&nbsp;        if(MyStringUtil.isNotEmpty(filterAndMap)){//进入与运算逻辑</b>
+<b class="nc"><i>41</i>&nbsp;            stream = this.makeFilterAnd(stream,filterAndMap);</b>
+<i>42</i>&nbsp;        }
+<i>43</i>&nbsp;
+<b class="nc"><i>44</i>&nbsp;        if(MyStringUtil.isNotEmpty(filterAndMap)) {//进入或运算逻辑</b>
+<b class="nc"><i>45</i>&nbsp;            stream = this.makeFilterOr(stream,filterOrMap);</b>
+<i>46</i>&nbsp;        }
+<b class="nc"><i>47</i>&nbsp;        if (limit &gt; 0) {//分页取值</b>
+<b class="nc"><i>48</i>&nbsp;            stream = stream.limit(limit);</b>
+<i>49</i>&nbsp;        }
+<b class="nc"><i>50</i>&nbsp;        List&lt;ProductPO&gt; returnList = new ArrayList&lt;&gt;();</b>
+<b class="nc"><i>51</i>&nbsp;        if(MyStringUtil.isNotEmpty(sortAndGroupMap)) {//进入分组排序逻辑</b>
+<b class="nc"><i>52</i>&nbsp;            stream = this.makeSort(stream,sortAndGroupMap);</b>
+<b class="nc"><i>53</i>&nbsp;            returnList = stream.collect(Collectors.toList());</b>
+<b class="nc"><i>54</i>&nbsp;            System.out.println(&quot;=============打印排序分页后的集合数据===========：&quot; + JSONObject.toJSONString(returnList));</b>
+<b class="nc"><i>55</i>&nbsp;            if (sortAndGroupMap.containsKey(OperateType.GROUP.toString())) {//分组</b>
+<b class="nc"><i>56</i>&nbsp;                return this.makeGroup(returnList,sortAndGroupMap);</b>
+<i>57</i>&nbsp;            } else {//没有分组信息，直接获取前面筛选排序的结果，否则返回分组后的数据
+<b class="nc"><i>58</i>&nbsp;                return JSONObject.toJSONString(returnList);</b>
+<i>59</i>&nbsp;            }
+<i>60</i>&nbsp;        } else {//没有进最后的分组排序逻辑，直接返回前面条件筛选的结果
+<b class="nc"><i>61</i>&nbsp;            returnList = stream.collect(Collectors.toList());</b>
+<b class="nc"><i>62</i>&nbsp;            return JSONObject.toJSONString(returnList);</b>
+<i>63</i>&nbsp;        }
+<i>64</i>&nbsp;    }
+<i>65</i>&nbsp;
+<i>66</i>&nbsp;    /**
+<i>67</i>&nbsp;     * 获取与条件下的筛选数据
+<i>68</i>&nbsp;     *
+<i>69</i>&nbsp;     * @param stream Stream流
+<i>70</i>&nbsp;     * @param filterAndMap  筛选过滤”与“条件，key值传运算符（主要实现了以下几种：equals,contains,startsWith），value值传对应数据对象条件
+<i>71</i>&nbsp;     * @return
+<i>72</i>&nbsp;     */
+<i>73</i>&nbsp;    public Stream&lt;ProductPO&gt; makeFilterAnd(Stream&lt;ProductPO&gt; stream,Map&lt;String,ProductPO&gt; filterAndMap){
+<b class="nc"><i>74</i>&nbsp;        if (filterAndMap.containsKey(OperateType.equals.toString())) {//判断传入条件是否包含等于运算符</b>
+<b class="nc"><i>75</i>&nbsp;            ProductPO product = filterAndMap.get(OperateType.equals.toString());</b>
+<b class="nc"><i>76</i>&nbsp;            if (MyStringUtil.isNotEmpty(product)) {</b>
+<b class="nc"><i>77</i>&nbsp;                Predicate&lt;ProductPO&gt; predicate = lsProductPO -&gt; (MyStringUtil.isNotEmpty(product.getId()) ? lsProductPO.getId() == product.getId() : true)</b>
+<b class="nc"><i>78</i>&nbsp;                        &amp;&amp; (MyStringUtil.isNotEmpty(product.getProductName()) ? lsProductPO.getProductName().equals(product.getProductName()) : true)</b>
+<b class="nc"><i>79</i>&nbsp;                        &amp;&amp; (MyStringUtil.isNotEmpty(product.getProductDesc()) ? lsProductPO.getProductDesc().equals(product.getProductDesc()) : true)</b>
+<b class="nc"><i>80</i>&nbsp;                        &amp;&amp; (MyStringUtil.isNotEmpty(product.getStockNum()) ? lsProductPO.getStockNum() == product.getStockNum() : true)</b>
+<b class="nc"><i>81</i>&nbsp;                        &amp;&amp; (MyStringUtil.isNotEmpty(product.getAddTime()) ? lsProductPO.getAddTime().equals(product.getAddTime()) : true);</b>
+<b class="nc"><i>82</i>&nbsp;                stream = stream.filter(predicate);</b>
+<i>83</i>&nbsp;
+<i>84</i>&nbsp;            }
+<i>85</i>&nbsp;        }
+<b class="nc"><i>86</i>&nbsp;        if (filterAndMap.containsKey(&quot;contains&quot;)) {//判断传入条件是否拥有包含运算符</b>
+<b class="nc"><i>87</i>&nbsp;            ProductPO product = filterAndMap.get(&quot;contains&quot;);</b>
+<b class="nc"><i>88</i>&nbsp;            if (MyStringUtil.isNotEmpty(product)) {</b>
+<b class="nc"><i>89</i>&nbsp;                Predicate&lt;ProductPO&gt; predicate = lsProductPO -&gt; (MyStringUtil.isNotEmpty(product.getProductName()) ? lsProductPO.getProductName().contains(product.getProductName()) : true)</b>
+<b class="nc"><i>90</i>&nbsp;                        &amp;&amp; (MyStringUtil.isNotEmpty(product.getProductDesc()) ? lsProductPO.getProductDesc().contains(product.getProductDesc()) : true);</b>
+<b class="nc"><i>91</i>&nbsp;                stream = stream.parallel().filter(predicate);</b>
+<i>92</i>&nbsp;            }
+<i>93</i>&nbsp;        }
+<b class="nc"><i>94</i>&nbsp;        if (filterAndMap.containsKey(&quot;startsWith&quot;)) {//判断传入条件是否拥有顺序匹配运算符</b>
+<b class="nc"><i>95</i>&nbsp;            ProductPO product = filterAndMap.get(&quot;startsWith&quot;);</b>
+<b class="nc"><i>96</i>&nbsp;            if (MyStringUtil.isNotEmpty(product)) {</b>
+<b class="nc"><i>97</i>&nbsp;                Predicate&lt;ProductPO&gt; predicate = lsProductPO -&gt; (MyStringUtil.isNotEmpty(product.getProductName()) ? lsProductPO.getProductName().startsWith(product.getProductName()) : true)</b>
+<b class="nc"><i>98</i>&nbsp;                        &amp;&amp; (MyStringUtil.isNotEmpty(product.getProductDesc()) ? lsProductPO.getProductDesc().startsWith(product.getProductDesc()) : true);</b>
+<b class="nc"><i>99</i>&nbsp;                stream = stream.parallel().filter(predicate);</b>
+<i>100</i>&nbsp;            }
+<i>101</i>&nbsp;        }
+<b class="nc"><i>102</i>&nbsp;        return stream;</b>
+<i>103</i>&nbsp;    }
+<i>104</i>&nbsp;
+<i>105</i>&nbsp;    /**
+<i>106</i>&nbsp;     * 条件或筛选数据
+<i>107</i>&nbsp;     *
+<i>108</i>&nbsp;     * @param stream Stream流
+<i>109</i>&nbsp;     * @param filterAndMap 筛选过滤”与“条件，key值传运算符（主要实现了以下几种：equals,contains,startsWith），value值传对应数据对象条件
+<i>110</i>&nbsp;     * @return
+<i>111</i>&nbsp;     */
+<i>112</i>&nbsp;    public Stream&lt;ProductPO&gt; makeFilterOr(Stream&lt;ProductPO&gt; stream,Map&lt;String,ProductPO&gt; filterAndMap){
+<b class="nc"><i>113</i>&nbsp;        if (filterAndMap.containsKey(OperateType.equals.toString())) {//判断传入条件是否包含等于运算符</b>
+<b class="nc"><i>114</i>&nbsp;            ProductPO product = filterAndMap.get(OperateType.equals.toString());</b>
+<b class="nc"><i>115</i>&nbsp;            if (MyStringUtil.isNotEmpty(product)) {//等于条件或运算</b>
+<b class="nc"><i>116</i>&nbsp;                Predicate&lt;ProductPO&gt; predicate = orProductPO -&gt; ((MyStringUtil.isNotEmpty(product.getId()) ? orProductPO.getId() == product.getId() : true)</b>
+<b class="nc"><i>117</i>&nbsp;                        || (MyStringUtil.isNotEmpty(product.getProductName()) ? orProductPO.getProductName().equals(product.getProductName()) : true)</b>
+<b class="nc"><i>118</i>&nbsp;                        || (MyStringUtil.isNotEmpty(product.getProductDesc()) ? orProductPO.getProductDesc().equals(product.getProductDesc()) : true)</b>
+<b class="nc"><i>119</i>&nbsp;                        || (MyStringUtil.isNotEmpty(product.getStockNum()) ? orProductPO.getStockNum() == product.getStockNum() : true)</b>
+<b class="nc"><i>120</i>&nbsp;                        || (MyStringUtil.isNotEmpty(product.getAddTime()) ? orProductPO.getAddTime().equals(product.getAddTime()) : true));</b>
+<b class="nc"><i>121</i>&nbsp;                stream = stream.filter(predicate);</b>
+<i>122</i>&nbsp;            }
+<i>123</i>&nbsp;        }
+<b class="nc"><i>124</i>&nbsp;        if (filterAndMap.containsKey(OperateType.contains.toString())) {//判断传入条件是否包含等于包含符</b>
+<b class="nc"><i>125</i>&nbsp;            ProductPO product = filterAndMap.get(OperateType.contains.toString());</b>
+<b class="nc"><i>126</i>&nbsp;            if (MyStringUtil.isNotEmpty(product)) {//包含条件或运算</b>
+<b class="nc"><i>127</i>&nbsp;                Predicate&lt;ProductPO&gt; predicate = orProductPO -&gt; ((MyStringUtil.isNotEmpty(product.getProductName()) ? orProductPO.getProductName().contains(product.getProductName()) : true)</b>
+<b class="nc"><i>128</i>&nbsp;                        || (MyStringUtil.isNotEmpty(product.getProductDesc()) ? orProductPO.getProductDesc().contains(product.getProductDesc()) : true));</b>
+<b class="nc"><i>129</i>&nbsp;                stream = stream.filter(predicate);</b>
+<i>130</i>&nbsp;            }
+<i>131</i>&nbsp;        }
+<b class="nc"><i>132</i>&nbsp;        if (filterAndMap.containsKey(OperateType.startsWith.toString())) {//判断传入条件是否包含等于运算符</b>
+<b class="nc"><i>133</i>&nbsp;            ProductPO product = filterAndMap.get(OperateType.startsWith.toString());</b>
+<b class="nc"><i>134</i>&nbsp;            if (MyStringUtil.isNotEmpty(product)) {//等于条件或运算</b>
+<b class="nc"><i>135</i>&nbsp;                Predicate&lt;ProductPO&gt; predicate = orProductPO -&gt; ((MyStringUtil.isNotEmpty(product.getProductName()) ? orProductPO.getProductName().startsWith(product.getProductName()) : true)</b>
+<b class="nc"><i>136</i>&nbsp;                        || (MyStringUtil.isNotEmpty(product.getProductDesc()) ? orProductPO.getProductDesc().startsWith(product.getProductDesc()) : true));</b>
+<b class="nc"><i>137</i>&nbsp;                stream = stream.filter(predicate);</b>
+<i>138</i>&nbsp;            }
+<i>139</i>&nbsp;        }
+<b class="nc"><i>140</i>&nbsp;        return stream;</b>
+<i>141</i>&nbsp;    }
+<i>142</i>&nbsp;
+<i>143</i>&nbsp;    /**
+<i>144</i>&nbsp;     * 排序方法实现
+<i>145</i>&nbsp;     *
+<i>146</i>&nbsp;     * @param stream Stream流
+<i>147</i>&nbsp;     * @param sortAndGroupMap 排序以及分组的遍历参数对象
+<i>148</i>&nbsp;     * @return
+<i>149</i>&nbsp;     */
+<i>150</i>&nbsp;    public Stream&lt;ProductPO&gt; makeSort(Stream&lt;ProductPO&gt; stream,Map&lt;String,ProductPO&gt; sortAndGroupMap){
+<b class="nc"><i>151</i>&nbsp;        if (sortAndGroupMap.containsKey(OperateType.ASC.toString())) {////排序，升序</b>
+<b class="nc"><i>152</i>&nbsp;            ProductPO product = sortAndGroupMap.get(OperateType.ASC.toString());</b>
+<b class="nc"><i>153</i>&nbsp;            if (MyStringUtil.isNotEmpty(product)) {//升序排列</b>
+<b class="nc"><i>154</i>&nbsp;                if (MyStringUtil.isNotEmpty(product.getId()) || &quot;id&quot;.equalsIgnoreCase(product.getOperateName())) {</b>
+<b class="nc"><i>155</i>&nbsp;                    stream = stream.sorted(Comparator.comparing(ProductPO::getId));</b>
+<i>156</i>&nbsp;                }
+<b class="nc"><i>157</i>&nbsp;                if (MyStringUtil.isNotEmpty(product.getStockNum()) || &quot;stockNum&quot;.equalsIgnoreCase(product.getOperateName())) {</b>
+<b class="nc"><i>158</i>&nbsp;                    stream = stream.sorted(Comparator.comparing(ProductPO::getStockNum));</b>
+<i>159</i>&nbsp;                }
+<b class="nc"><i>160</i>&nbsp;                if (MyStringUtil.isNotEmpty(product.getAddTime()) || &quot;addTime&quot;.equalsIgnoreCase(product.getOperateName())) {</b>
+<b class="nc"><i>161</i>&nbsp;                    stream = stream.sorted(Comparator.comparing(ProductPO::getAddTime));</b>
+<i>162</i>&nbsp;                }
+<i>163</i>&nbsp;
+<i>164</i>&nbsp;            }
+<i>165</i>&nbsp;        }
+<b class="nc"><i>166</i>&nbsp;        if (sortAndGroupMap.containsKey(OperateType.DESC.toString())) {//排序，倒序</b>
+<b class="nc"><i>167</i>&nbsp;            ProductPO product = sortAndGroupMap.get(OperateType.DESC.toString());</b>
+<b class="nc"><i>168</i>&nbsp;            if (MyStringUtil.isNotEmpty(product)) {//升序排列</b>
+<b class="nc"><i>169</i>&nbsp;                if (MyStringUtil.isNotEmpty(product.getId())) {</b>
+<b class="nc"><i>170</i>&nbsp;                    stream = stream.sorted(Comparator.comparing(ProductPO::getId).reversed());</b>
+<i>171</i>&nbsp;                }
+<b class="nc"><i>172</i>&nbsp;                if (MyStringUtil.isNotEmpty(product.getStockNum())) {</b>
+<b class="nc"><i>173</i>&nbsp;                    stream = stream.sorted(Comparator.comparing(ProductPO::getStockNum).reversed());</b>
+<i>174</i>&nbsp;                }
+<b class="nc"><i>175</i>&nbsp;                if (MyStringUtil.isNotEmpty(product.getAddTime())) {</b>
+<b class="nc"><i>176</i>&nbsp;                    stream = stream.sorted(Comparator.comparing(ProductPO::getAddTime).reversed());</b>
+<i>177</i>&nbsp;                }
+<i>178</i>&nbsp;            }
+<i>179</i>&nbsp;        }
+<b class="nc"><i>180</i>&nbsp;        return stream;</b>
+<i>181</i>&nbsp;    }
+<i>182</i>&nbsp;
+<i>183</i>&nbsp;    /**
+<i>184</i>&nbsp;     * 排序方法实现
+<i>185</i>&nbsp;     *
+<i>186</i>&nbsp;     * @param returnList 筛选排序过后的返回值
+<i>187</i>&nbsp;     * @param sortAndGroupMap 排序以及分组的遍历参数对象
+<i>188</i>&nbsp;     * @return
+<i>189</i>&nbsp;     */
+<i>190</i>&nbsp;    public String makeGroup(List&lt;ProductPO&gt; returnList ,Map&lt;String,ProductPO&gt; sortAndGroupMap){
+<b class="nc"><i>191</i>&nbsp;        ProductPO product = sortAndGroupMap.get(OperateType.GROUP.toString());</b>
+<b class="nc"><i>192</i>&nbsp;        Map&lt;Object, List&lt;ProductPO&gt;&gt; groupMap = new HashMap&lt;&gt;();</b>
+<b class="nc"><i>193</i>&nbsp;        Map&lt;Object, Map&lt;Object, List&lt;ProductPO&gt;&gt;&gt; map = new HashMap&lt;&gt;();</b>
+<b class="nc"><i>194</i>&nbsp;        if (MyStringUtil.isNotEmpty(product)) {//分组</b>
+<b class="nc"><i>195</i>&nbsp;            boolean isId = false;</b>
+<b class="nc"><i>196</i>&nbsp;            boolean isProductName = false;</b>
+<b class="nc"><i>197</i>&nbsp;            boolean isStockNum = false;</b>
+<b class="nc"><i>198</i>&nbsp;            boolean isAddTime = false;</b>
+<b class="nc"><i>199</i>&nbsp;            if (MyStringUtil.isNullOrEmpty(product.getId()) || &quot;id&quot;.equalsIgnoreCase(product.getOperateName())) {</b>
+<b class="nc"><i>200</i>&nbsp;                groupMap = returnList.stream().collect(Collectors.groupingBy(t -&gt; ((ProductPO) t).getId()));</b>
+<b class="nc"><i>201</i>&nbsp;                isId = true;</b>
+<i>202</i>&nbsp;            }
+<b class="nc"><i>203</i>&nbsp;            if (MyStringUtil.isNotEmpty(product.getProductName()) || &quot;productName&quot;.equalsIgnoreCase(product.getOperateName())) {</b>
+<b class="nc"><i>204</i>&nbsp;                groupMap =  returnList.stream().collect(Collectors.groupingBy(t -&gt; ((ProductPO) t).getProductName()));</b>
+<b class="nc"><i>205</i>&nbsp;                isProductName =true;</b>
+<i>206</i>&nbsp;            }
+<b class="nc"><i>207</i>&nbsp;            if (MyStringUtil.isNotEmpty(product.getStockNum()) || &quot;stockNum&quot;.equalsIgnoreCase(product.getOperateName())) {</b>
+<b class="nc"><i>208</i>&nbsp;                groupMap=  returnList.stream().collect(Collectors.groupingBy(t -&gt; ((ProductPO) t).getStockNum()));</b>
+<b class="nc"><i>209</i>&nbsp;                isStockNum = true;</b>
+<i>210</i>&nbsp;            }
+<b class="nc"><i>211</i>&nbsp;            if (MyStringUtil.isNotEmpty(product.getProductName()) || &quot;addTime&quot;.equalsIgnoreCase(product.getOperateName())) {</b>
+<b class="nc"><i>212</i>&nbsp;                groupMap = returnList.stream().collect(Collectors.groupingBy(t -&gt; ((ProductPO) t).getAddTime()));</b>
+<b class="nc"><i>213</i>&nbsp;                isAddTime = true;</b>
+<i>214</i>&nbsp;            }
+<b class="nc"><i>215</i>&nbsp;            if(isId&amp;&amp;isProductName){//多个条件组合排序</b>
+<b class="nc"><i>216</i>&nbsp;                map =  returnList.stream().collect(Collectors.groupingBy(t -&gt; ((ProductPO) t).getId(), Collectors.groupingBy(t -&gt; ((ProductPO) t).getProductName())));</b>
+<i>217</i>&nbsp;            }
+<b class="nc"><i>218</i>&nbsp;            if(isStockNum&amp;&amp;isProductName){//多个条件组合排序</b>
+<b class="nc"><i>219</i>&nbsp;                map =  returnList.stream().collect(Collectors.groupingBy(t -&gt; ((ProductPO) t).getStockNum(), Collectors.groupingBy(t -&gt; ((ProductPO) t).getProductName())));</b>
+<i>220</i>&nbsp;            }
+<i>221</i>&nbsp;
+<b class="nc"><i>222</i>&nbsp;            if(isAddTime&amp;&amp;isProductName){//多个条件组合排序</b>
+<b class="nc"><i>223</i>&nbsp;                map =  returnList.stream().collect(Collectors.groupingBy(t -&gt; ((ProductPO) t).getProductName(), Collectors.groupingBy(t -&gt; ((ProductPO) t).getAddTime())));</b>
+<i>224</i>&nbsp;            }
+<i>225</i>&nbsp;
+<i>226</i>&nbsp;        }
+<b class="nc"><i>227</i>&nbsp;        if(MyStringUtil.isNotEmpty(map)){</b>
+<b class="nc"><i>228</i>&nbsp;            return JSONObject.toJSONString(map);</b>
+<i>229</i>&nbsp;        }
+<b class="nc"><i>230</i>&nbsp;        return JSONObject.toJSONString(groupMap);</b>
+<i>231</i>&nbsp;    }
+<i>232</i>&nbsp;
+<i>233</i>&nbsp;
+<i>234</i>&nbsp;    /**
+<i>235</i>&nbsp;     * 接口测试入口，涉及到与计算机的输入交互，没有放到测试类下面去放在测试内下
+<i>236</i>&nbsp;     * ，代码覆盖率测试跑不过去
+<i>237</i>&nbsp;     *
+<i>238</i>&nbsp;     * @param args
+<i>239</i>&nbsp;     * @throws Exception
+<i>240</i>&nbsp;     */
+<i>241</i>&nbsp;    public static void main(String[] args) throws Exception {
+<b class="nc"><i>242</i>&nbsp;        MySelector mySelector = new MySelector();</b>
+<b class="nc"><i>243</i>&nbsp;        Scanner sc = new Scanner(System.in);</b>
+<b class="nc"><i>244</i>&nbsp;        System.out.println(&quot;请输入要生成的数据》》》》》》输入整数：&quot;);</b>
+<b class="nc"><i>245</i>&nbsp;        int data = sc.nextInt();</b>
+<b class="nc"><i>246</i>&nbsp;        List&lt;ProductPO&gt; dataList = new ArrayList&lt;ProductPO&gt;();</b>
+<b class="nc"><i>247</i>&nbsp;        String[] productNames = new String[]{&quot;羽绒服&quot;,&quot;阔腿裤&quot;,&quot;T恤&quot;,&quot;大衣&quot;,&quot;短裤&quot;,&quot;篮球&quot;,&quot;足球&quot;,&quot;羽毛球&quot;,&quot;手机&quot;,&quot;电脑&quot;};</b>
+<b class="nc"><i>248</i>&nbsp;        Random random = new Random();</b>
+<b class="nc"><i>249</i>&nbsp;        for(int i=0;i&lt;data;i++){</b>
+<b class="nc"><i>250</i>&nbsp;            ProductPO  productPO = new ProductPO(i,productNames[random.nextInt(productNames.length)]+i/2,&quot;备注&quot;+i/5,data-i/3,new Date());</b>
+<b class="nc"><i>251</i>&nbsp;            dataList.add(productPO);</b>
+<i>252</i>&nbsp;        }
+<b class="nc"><i>253</i>&nbsp;        System.out.println(&quot;=============================数据录入成功,当前有数据：&quot;+data + &quot;条&quot;);</b>
+<i>254</i>&nbsp;
+<b class="nc"><i>255</i>&nbsp;        System.out.println(&quot;马上为您生成动态查询条件，请稍后：&quot;);</b>
+<i>256</i>&nbsp;        //封装与运算条件
+<b class="nc"><i>257</i>&nbsp;        ProductPO paramProduct = new ProductPO(null,productNames[random.nextInt(productNames.length)],&quot;&quot;,null,null);</b>
+<b class="nc"><i>258</i>&nbsp;        Map&lt;String,ProductPO&gt; filterAndMap = new HashMap&lt;&gt;();</b>
+<b class="nc"><i>259</i>&nbsp;        paramProduct.setOperateType(OperateType.contains.toString());</b>
+<b class="nc"><i>260</i>&nbsp;        paramProduct.setOperateName(OperateType.contains.toString());</b>
+<b class="nc"><i>261</i>&nbsp;        filterAndMap.put(OperateType.contains.toString(),paramProduct);</b>
+<i>262</i>&nbsp;        //封装或运算条件
+<b class="nc"><i>263</i>&nbsp;        Map&lt;String,ProductPO&gt; filterOrMap = new HashMap&lt;&gt;();</b>
+<b class="nc"><i>264</i>&nbsp;        paramProduct = new ProductPO(random.nextInt(dataList.size()),null,&quot;&quot;,random.nextInt(dataList.size()/5),null);</b>
+<b class="nc"><i>265</i>&nbsp;        paramProduct.setOperateType(OperateType.equals.toString());</b>
+<b class="nc"><i>266</i>&nbsp;        paramProduct.setOperateName(OperateType.equals.toString());</b>
+<b class="nc"><i>267</i>&nbsp;        filterOrMap.put(OperateType.equals.toString(),paramProduct);</b>
+<i>268</i>&nbsp;        //封装分组排序条件
+<b class="nc"><i>269</i>&nbsp;        Map&lt;String,ProductPO&gt; sortAndGroupMap = new HashMap&lt;&gt;();</b>
+<b class="nc"><i>270</i>&nbsp;        paramProduct = new ProductPO(null,null,null,random.nextInt(dataList.size()),null);</b>
+<b class="nc"><i>271</i>&nbsp;        paramProduct.setOperateType(OperateType.ASC.toString());</b>
+<b class="nc"><i>272</i>&nbsp;        paramProduct.setOperateName(OperateType.ASC.toString());</b>
+<b class="nc"><i>273</i>&nbsp;        sortAndGroupMap.put(OperateType.ASC.toString(),paramProduct);</b>
+<b class="nc"><i>274</i>&nbsp;        paramProduct = new ProductPO(null,&quot;大衣&quot;,null,1,null);</b>
+<b class="nc"><i>275</i>&nbsp;        paramProduct.setOperateType(OperateType.GROUP.toString());</b>
+<b class="nc"><i>276</i>&nbsp;        paramProduct.setOperateName(OperateType.GROUP.toString());</b>
+<b class="nc"><i>277</i>&nbsp;        sortAndGroupMap.put(OperateType.GROUP.toString(),paramProduct);</b>
+<i>278</i>&nbsp;        System.out.println(&quot;=================================查询数据准备完成，当前条件：filterAndMap---&quot;+JSONObject.toJSONString(filterAndMap));
+<b class="nc"><i>279</i>&nbsp;        System.out.println(&quot;=================================过滤或条件：filterOrMap----&quot;+JSONObject.toJSONString(filterOrMap));</b>
+<b class="nc"><i>280</i>&nbsp;        System.out.println(&quot;=================================排序分组条件：sortAndGroupMap----&quot;+JSONObject.toJSONString(sortAndGroupMap));</b>
+<b class="nc"><i>281</i>&nbsp;        System.out.println(&quot;=========================================================================================&quot;);</b>
+<b class="nc"><i>282</i>&nbsp;        System.out.println(&quot;===========================请输入想控制的页数limit，必须输入哦！赶快输入——————————》》》》》：&quot;);</b>
+<b class="nc"><i>283</i>&nbsp;        int limit = sc.nextInt();</b>
+<b class="nc"><i>284</i>&nbsp;        System.out.println(&quot;========================参数录入完毕啦，开始请求接口了===================================&quot;);</b>
+<i>285</i>&nbsp;        long currentTimeMillisStart = System.currentTimeMillis();
+<i>286</i>&nbsp;        String result = mySelector.query(dataList,filterAndMap,filterOrMap,sortAndGroupMap,limit);
+<b class="nc"><i>287</i>&nbsp;        long currentTimeMillisEnd = System.currentTimeMillis();</b>
+<b class="nc"><i>288</i>&nbsp;        System.out.println(&quot;--------------------------------》》》》请求一共耗时：&quot; + (currentTimeMillisEnd-currentTimeMillisStart));</b>
+<b class="nc"><i>289</i>&nbsp;        System.out.println(&quot;==============================&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;最后筛选结果：&quot;+result);</b>
+<b class="nc"><i>290</i>&nbsp;    }</b>
+<b class="nc"><i>291</i>&nbsp;}</b>
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2021-03-06 10:12</div>
+</div>
+</body>
+</html>

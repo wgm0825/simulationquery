@@ -1,0 +1,519 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: SimulationBtree</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">com.example.simulationquerydemo.btree</a> ]
+</div>
+
+<h1>Coverage Summary for Class: SimulationBtree (com.example.simulationquerydemo.btree)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SimulationBtree</td>
+<td class="coverageStat">
+  <span class="percent">
+    80%
+  </span>
+  <span class="absValue">
+    (4/ 5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    80%
+  </span>
+  <span class="absValue">
+    (16/ 20)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">SimulationBtree$LeafNode</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/ 4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    90.3%
+  </span>
+  <span class="absValue">
+    (65/ 72)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">SimulationBtree$NonLeafNode</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (5/ 5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    98.5%
+  </span>
+  <span class="absValue">
+    (67/ 68)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">SimulationBtree$ParentNode</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (6/ 6)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    93.3%
+  </span>
+  <span class="absValue">
+    (14/ 15)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    92.8%
+  </span>
+  <span class="absValue">
+    (154/ 166)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package com.example.simulationquerydemo.btree;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import com.example.simulationquerydemo.common.ConstantEnum;
+<i>4</i>&nbsp;
+<i>5</i>&nbsp;
+<i>6</i>&nbsp;/**
+<i>7</i>&nbsp; * 思路：考虑到模仿sql查询问题，首先想到的是mysql底层的B+Tree数据结构。这里我们使用java代码模拟实现B+tree,因时间原因，功能未完全实现，且此处代码有参考网上实现。
+<i>8</i>&nbsp; * 这里考虑到全量数据可能会有数据量过大的问题，在生成B+Tree数据结构后，考虑将树结构缓存到本地内存，再次加载时，通过加载内存中树结构中的数据，提升查询效率。
+<i>9</i>&nbsp; * 经过本地测试，在不考虑初次数据加载生成B+Tree的时间情况下，单纯通过查询树结构
+<i>10</i>&nbsp; *
+<i>11</i>&nbsp; * TODO 未完成全部逻辑，待时间充裕后补充
+<i>12</i>&nbsp; *
+<i>13</i>&nbsp; * @ProgramName: simulationquerydemo
+<i>14</i>&nbsp; * @ClassName: SimulationBtree
+<i>15</i>&nbsp; * @Description: java模仿B+tree实现SQL查询
+<i>16</i>&nbsp; * @Author: gm
+<i>17</i>&nbsp; * @Date: 2021/3/4 0004
+<i>18</i>&nbsp; * @Version: 1.0
+<i>19</i>&nbsp; */
+<b class="fc"><i>20</i>&nbsp;public class SimulationBtree&lt;K extends Comparable&lt;K&gt;,T&gt;   {</b>
+<i>21</i>&nbsp;
+<i>22</i>&nbsp;    //实现B+tree的高度
+<i>23</i>&nbsp;    private static Integer treeHeight;
+<i>24</i>&nbsp;
+<i>25</i>&nbsp;    //设置非叶子节点最大的子节点数量（一般不超过树的高度）
+<i>26</i>&nbsp;    private  Integer maxNoLeafNodeNum;
+<i>27</i>&nbsp;
+<i>28</i>&nbsp;    //用来生成树的中间节点类（节点父类）
+<i>29</i>&nbsp;    private ParentNode&lt;K,T&gt; parentNode;
+<i>30</i>&nbsp;
+<i>31</i>&nbsp;    //叶子节点类
+<i>32</i>&nbsp;    private LeafNode&lt;K,T&gt; leafNode;
+<i>33</i>&nbsp;
+<i>34</i>&nbsp;    //空构造方法，默认高度为3
+<i>35</i>&nbsp;    public SimulationBtree(){
+<b class="nc"><i>36</i>&nbsp;        this(ConstantEnum.CONSTANT_THREE.getCode());</b>
+<b class="nc"><i>37</i>&nbsp;    }</b>
+<i>38</i>&nbsp;
+<i>39</i>&nbsp;    //构造方法，自定义B+Tree高度
+<b class="fc"><i>40</i>&nbsp;    public SimulationBtree(Integer treeHeight) {</b>
+<b class="fc"><i>41</i>&nbsp;        this.treeHeight = treeHeight;</b>
+<i>42</i>&nbsp;        //避免插入节点超过上限
+<b class="fc"><i>43</i>&nbsp;        this.maxNoLeafNodeNum = treeHeight + 1;</b>
+<b class="fc"><i>44</i>&nbsp;        this.parentNode = new LeafNode&lt;K, T&gt;();</b>
+<b class="fc"><i>45</i>&nbsp;        this.leafNode = null;</b>
+<b class="fc"><i>46</i>&nbsp;    }</b>
+<i>47</i>&nbsp;
+<i>48</i>&nbsp;    //根据节点查询树节点
+<i>49</i>&nbsp;    public T find(K key){
+<b class="fc"><i>50</i>&nbsp;        T t = this.parentNode.find(key);</b>
+<b class="fc"><i>51</i>&nbsp;        if(t == null){</b>
+<b class="nc"><i>52</i>&nbsp;            System.out.println(&quot;数据不存在&quot;);</b>
+<i>53</i>&nbsp;        }
+<b class="fc"><i>54</i>&nbsp;        return t;</b>
+<i>55</i>&nbsp;    }
+<i>56</i>&nbsp;
+<i>57</i>&nbsp;    //插入树节点
+<i>58</i>&nbsp;    public void insert(K key, T value){
+<b class="fc"><i>59</i>&nbsp;        if(key == null) {</b>
+<b class="nc"><i>60</i>&nbsp;            return;</b>
+<i>61</i>&nbsp;        }
+<b class="fc"><i>62</i>&nbsp;        ParentNode&lt;K, T&gt; t = this.parentNode.insert(key, value);</b>
+<b class="fc"><i>63</i>&nbsp;        if(t != null){</b>
+<b class="fc"><i>64</i>&nbsp;            this.parentNode = t;</b>
+<i>65</i>&nbsp;        }
+<b class="fc"><i>66</i>&nbsp;        this.leafNode = this.parentNode.refreshLeft();</b>
+<b class="fc"><i>67</i>&nbsp;    }</b>
+<i>68</i>&nbsp;
+<i>69</i>&nbsp;    abstract class ParentNode&lt;K extends Comparable&lt;K&gt;, T&gt;{
+<i>70</i>&nbsp;        //父节点
+<i>71</i>&nbsp;        protected ParentNode&lt;K, T&gt; parent;
+<i>72</i>&nbsp;        //子节点数组
+<i>73</i>&nbsp;        protected ParentNode&lt;K, T&gt;[] children;
+<i>74</i>&nbsp;        //子节点数量
+<i>75</i>&nbsp;        protected Integer number;
+<i>76</i>&nbsp;        //节点对应的键数组
+<i>77</i>&nbsp;        protected Object keys[];
+<i>78</i>&nbsp;
+<i>79</i>&nbsp;        //构造方法
+<b class="fc"><i>80</i>&nbsp;        ParentNode(){</b>
+<b class="fc"><i>81</i>&nbsp;            this.keys = new Object[maxNoLeafNodeNum];</b>
+<b class="fc"><i>82</i>&nbsp;            this.children =  new ParentNode[maxNoLeafNodeNum];</b>
+<b class="fc"><i>83</i>&nbsp;            this.number = 0;</b>
+<b class="fc"><i>84</i>&nbsp;            this.parent = null;</b>
+<b class="fc"><i>85</i>&nbsp;        }</b>
+<i>86</i>&nbsp;
+<i>87</i>&nbsp;        //根据key查找对应树节点数据
+<i>88</i>&nbsp;        abstract T find(K key);
+<i>89</i>&nbsp;
+<i>90</i>&nbsp;        //插入
+<i>91</i>&nbsp;        abstract ParentNode&lt;K, T&gt; insert(K key,T value);
+<i>92</i>&nbsp;
+<i>93</i>&nbsp;        abstract LeafNode&lt;K, T&gt; refreshLeft();
+<i>94</i>&nbsp;
+<i>95</i>&nbsp;    }
+<i>96</i>&nbsp;
+<i>97</i>&nbsp;    class NonLeafNode&lt;K extends Comparable&lt;K&gt;, T&gt; extends ParentNode&lt;K,T&gt; {
+<b class="fc"><i>98</i>&nbsp;        public NonLeafNode() {</b>
+<b class="fc"><i>99</i>&nbsp;            super();</b>
+<b class="fc"><i>100</i>&nbsp;        }</b>
+<i>101</i>&nbsp;
+<i>102</i>&nbsp;        /**
+<i>103</i>&nbsp;         * 递归查找,这里只是为了确定值究竟在哪一块,真正的查找到叶子节点才会查
+<i>104</i>&nbsp;         * @param key
+<i>105</i>&nbsp;         * @return
+<i>106</i>&nbsp;         */
+<i>107</i>&nbsp;        @Override
+<i>108</i>&nbsp;        T find(K key) {
+<b class="fc"><i>109</i>&nbsp;            int i = 0;</b>
+<b class="fc"><i>110</i>&nbsp;            while(i &lt; this.number){</b>
+<b class="fc"><i>111</i>&nbsp;                if(key.compareTo((K) this.keys[i]) &lt;= 0)</b>
+<b class="fc"><i>112</i>&nbsp;                    break;</b>
+<b class="fc"><i>113</i>&nbsp;                i++;</b>
+<i>114</i>&nbsp;            }
+<b class="fc"><i>115</i>&nbsp;            if(this.number == i){</b>
+<b class="nc"><i>116</i>&nbsp;                return null;</b>
+<i>117</i>&nbsp;            }
+<b class="fc"><i>118</i>&nbsp;            return this.children[i].find(key);</b>
+<i>119</i>&nbsp;        }
+<i>120</i>&nbsp;
+<i>121</i>&nbsp;        /**
+<i>122</i>&nbsp;         * 递归插入节点数据，插入数据是会按照B+Tree的特点，插入生成排好序的树
+<i>123</i>&nbsp;         * 这里主要是获取到地址，插入数据需要到叶子结点类去实现
+<i>124</i>&nbsp;         *
+<i>125</i>&nbsp;         * @param value
+<i>126</i>&nbsp;         * @param key
+<i>127</i>&nbsp;         */
+<i>128</i>&nbsp;        @Override
+<i>129</i>&nbsp;        ParentNode&lt;K, T&gt; insert( K key ,T value) {
+<b class="fc"><i>130</i>&nbsp;            int i = 0;</b>
+<b class="fc"><i>131</i>&nbsp;            while(i &lt; this.number){</b>
+<b class="fc"><i>132</i>&nbsp;                if(key.compareTo((K) this.keys[i]) &lt; 0)</b>
+<b class="fc"><i>133</i>&nbsp;                    break;</b>
+<b class="fc"><i>134</i>&nbsp;                i++;</b>
+<i>135</i>&nbsp;            }
+<b class="fc"><i>136</i>&nbsp;            if(key.compareTo((K) this.keys[this.number - 1]) &gt;= 0) {</b>
+<b class="fc"><i>137</i>&nbsp;                i--;</b>
+<i>138</i>&nbsp;            }
+<i>139</i>&nbsp;           /* if (Integer)key &gt; 10) {
+<i>140</i>&nbsp;                System.out.println(&quot;监控中&quot;);
+<i>141</i>&nbsp;            }*/
+<b class="fc"><i>142</i>&nbsp;            return this.children[i].insert(key, value);</b>
+<i>143</i>&nbsp;        }
+<i>144</i>&nbsp;
+<i>145</i>&nbsp;        @Override
+<i>146</i>&nbsp;        LeafNode&lt;K, T&gt; refreshLeft() {
+<b class="fc"><i>147</i>&nbsp;            return this.children[0].refreshLeft();</b>
+<i>148</i>&nbsp;        }
+<i>149</i>&nbsp;
+<i>150</i>&nbsp;
+<i>151</i>&nbsp;        /**
+<i>152</i>&nbsp;         * 当叶子节点插入成功完成分解时,递归地向父节点插入新的节点以保持平衡
+<i>153</i>&nbsp;         *
+<i>154</i>&nbsp;         * @param node1
+<i>155</i>&nbsp;         * @param node2
+<i>156</i>&nbsp;         * @param key
+<i>157</i>&nbsp;         */
+<i>158</i>&nbsp;        ParentNode&lt;K, T&gt; insertNode(ParentNode&lt;K, T&gt; node1, ParentNode&lt;K, T&gt; node2, K key){
+<i>159</i>&nbsp;
+<b class="fc"><i>160</i>&nbsp;            K oldKey = null;</b>
+<b class="fc"><i>161</i>&nbsp;            if(this.number &gt; 0){</b>
+<b class="fc"><i>162</i>&nbsp;                oldKey = (K) this.keys[this.number - 1];</b>
+<i>163</i>&nbsp;            }
+<i>164</i>&nbsp;            //如果原有key为null,说明这个非叶子节点是空的,直接放入两个节点即可
+<b class="fc"><i>165</i>&nbsp;            if(key == null || this.number &lt;= 0){</b>
+<b class="fc"><i>166</i>&nbsp;                this.keys[0] = node1.keys[node1.number - 1];</b>
+<b class="fc"><i>167</i>&nbsp;                this.keys[1] = node2.keys[node2.number - 1];</b>
+<b class="fc"><i>168</i>&nbsp;                this.children[0] = node1;</b>
+<b class="fc"><i>169</i>&nbsp;                this.children[1] = node2;</b>
+<b class="fc"><i>170</i>&nbsp;                this.number += 2;</b>
+<b class="fc"><i>171</i>&nbsp;                return this;</b>
+<i>172</i>&nbsp;            }
+<i>173</i>&nbsp;            //原有节点不为空,则应该先寻找原有节点的位置,然后将新的节点插入到原有节点中
+<b class="fc"><i>174</i>&nbsp;            int i = 0;</b>
+<b class="fc"><i>175</i>&nbsp;            while(key.compareTo((K)this.keys[i]) != 0){</b>
+<b class="fc"><i>176</i>&nbsp;                i++;</b>
+<i>177</i>&nbsp;            }
+<i>178</i>&nbsp;            //左边节点的最大值可以直接插入,右边的要挪一挪再进行插入
+<b class="fc"><i>179</i>&nbsp;            this.keys[i] = node1.keys[node1.number - 1];</b>
+<b class="fc"><i>180</i>&nbsp;            this.children[i] = node1;</b>
+<i>181</i>&nbsp;
+<b class="fc"><i>182</i>&nbsp;            Object tempKeys[] = new Object[maxNoLeafNodeNum];</b>
+<b class="fc"><i>183</i>&nbsp;            Object tempChildren[] = new ParentNode[maxNoLeafNodeNum];</b>
+<i>184</i>&nbsp;
+<b class="fc"><i>185</i>&nbsp;            System.arraycopy(this.keys, 0, tempKeys, 0, i + 1);</b>
+<b class="fc"><i>186</i>&nbsp;            System.arraycopy(this.children, 0, tempChildren, 0, i + 1);</b>
+<b class="fc"><i>187</i>&nbsp;            System.arraycopy(this.keys, i + 1, tempKeys, i + 2, this.number - i - 1);</b>
+<b class="fc"><i>188</i>&nbsp;            System.arraycopy(this.children, i + 1, tempChildren, i + 2, this.number - i - 1);</b>
+<b class="fc"><i>189</i>&nbsp;            tempKeys[i + 1] = node2.keys[node2.number - 1];</b>
+<b class="fc"><i>190</i>&nbsp;            tempChildren[i + 1] = node2;</b>
+<i>191</i>&nbsp;
+<b class="fc"><i>192</i>&nbsp;            this.number++;</b>
+<i>193</i>&nbsp;
+<i>194</i>&nbsp;            //如果不需要拆分,把数组复制回去,直接返回
+<b class="fc"><i>195</i>&nbsp;            if(this.number &lt; treeHeight){</b>
+<b class="fc"><i>196</i>&nbsp;                System.arraycopy(tempKeys, 0, this.keys, 0, this.number);</b>
+<b class="fc"><i>197</i>&nbsp;                System.arraycopy(tempChildren, 0, this.children, 0, this.number);</b>
+<b class="fc"><i>198</i>&nbsp;                return null;</b>
+<i>199</i>&nbsp;            }
+<i>200</i>&nbsp;            //如果需要拆分,和拆叶子节点时类似,从中间拆开
+<b class="fc"><i>201</i>&nbsp;            Integer middle = this.number / 2;</b>
+<i>202</i>&nbsp;            //新建非叶子节点,作为拆分的右半部分
+<b class="fc"><i>203</i>&nbsp;            NonLeafNode&lt;K, T&gt; parentNode = new NonLeafNode&lt;K, T&gt;();</b>
+<i>204</i>&nbsp;            //非叶子节点更新父节点指针
+<b class="fc"><i>205</i>&nbsp;            parentNode.number = this.number - middle;</b>
+<b class="fc"><i>206</i>&nbsp;            parentNode.parent = this.parent;</b>
+<i>207</i>&nbsp;            //如果父节点为空,则新建一个非叶子节点作为父节点,并且让拆分成功的两个非叶子节点的指针指向父节点
+<b class="fc"><i>208</i>&nbsp;            if(this.parent == null) {</b>
+<b class="fc"><i>209</i>&nbsp;                NonLeafNode&lt;K, T&gt; tempNonLeafNode = new NonLeafNode&lt;&gt;();</b>
+<b class="fc"><i>210</i>&nbsp;                parentNode.parent = tempNonLeafNode;</b>
+<b class="fc"><i>211</i>&nbsp;                this.parent = tempNonLeafNode;</b>
+<b class="fc"><i>212</i>&nbsp;                oldKey = null;</b>
+<i>213</i>&nbsp;            }
+<b class="fc"><i>214</i>&nbsp;            System.arraycopy(tempKeys, middle, parentNode.keys, 0, parentNode.number);</b>
+<b class="fc"><i>215</i>&nbsp;            System.arraycopy(tempChildren, middle, parentNode.children, 0, parentNode.number);</b>
+<b class="fc"><i>216</i>&nbsp;            for(int j = 0; j &lt; parentNode.number; j++){</b>
+<b class="fc"><i>217</i>&nbsp;                parentNode.children[j].parent = parentNode;</b>
+<i>218</i>&nbsp;            }
+<i>219</i>&nbsp;            //让原有非叶子节点作为左边节点
+<b class="fc"><i>220</i>&nbsp;            this.number = middle;</b>
+<b class="fc"><i>221</i>&nbsp;            this.keys = new Object[maxNoLeafNodeNum];</b>
+<b class="fc"><i>222</i>&nbsp;            this.children = new ParentNode[maxNoLeafNodeNum];</b>
+<b class="fc"><i>223</i>&nbsp;            System.arraycopy(tempKeys, 0, this.keys, 0, middle);</b>
+<b class="fc"><i>224</i>&nbsp;            System.arraycopy(tempChildren, 0, this.children, 0, middle);</b>
+<i>225</i>&nbsp;
+<i>226</i>&nbsp;            //叶子节点拆分成功后,需要把新生成的节点插入父节点
+<b class="fc"><i>227</i>&nbsp;            NonLeafNode&lt;K, T&gt; ParentNode = (NonLeafNode&lt;K, T&gt;)this.parent;</b>
+<b class="fc"><i>228</i>&nbsp;            return ParentNode.insertNode(this, parentNode, oldKey);</b>
+<i>229</i>&nbsp;        }
+<i>230</i>&nbsp;
+<i>231</i>&nbsp;    }
+<i>232</i>&nbsp;    //叶子节点类
+<i>233</i>&nbsp;    class LeafNode&lt;K extends Comparable&lt;K&gt; ,T&gt; extends ParentNode&lt;K, T&gt; {
+<i>234</i>&nbsp;        protected Object values[];
+<i>235</i>&nbsp;        protected LeafNode left;
+<i>236</i>&nbsp;        protected LeafNode right;
+<i>237</i>&nbsp;
+<b class="fc"><i>238</i>&nbsp;        public LeafNode(){</b>
+<b class="fc"><i>239</i>&nbsp;            super();</b>
+<b class="fc"><i>240</i>&nbsp;            this.values = new Object[maxNoLeafNodeNum];</b>
+<b class="fc"><i>241</i>&nbsp;            this.left = null;</b>
+<b class="fc"><i>242</i>&nbsp;            this.right = null;</b>
+<b class="fc"><i>243</i>&nbsp;        }</b>
+<i>244</i>&nbsp;
+<i>245</i>&nbsp;        /**
+<i>246</i>&nbsp;         * 进行查找,使用二分查找法
+<i>247</i>&nbsp;         *
+<i>248</i>&nbsp;         * @param key
+<i>249</i>&nbsp;         * @return
+<i>250</i>&nbsp;         */
+<i>251</i>&nbsp;        @Override
+<i>252</i>&nbsp;        T find(K key) {
+<b class="fc"><i>253</i>&nbsp;            if(this.number &lt;=0){</b>
+<b class="nc"><i>254</i>&nbsp;                return null;</b>
+<i>255</i>&nbsp;            }
+<b class="fc"><i>256</i>&nbsp;            Integer left = 0;</b>
+<b class="fc"><i>257</i>&nbsp;            Integer right = this.number;</b>
+<i>258</i>&nbsp;
+<b class="fc"><i>259</i>&nbsp;            Integer middle = (left + right) / 2;</b>
+<i>260</i>&nbsp;
+<b class="fc"><i>261</i>&nbsp;            while(left &lt; right){</b>
+<b class="fc"><i>262</i>&nbsp;                K middleKey = (K) this.keys[middle];</b>
+<b class="fc"><i>263</i>&nbsp;                if(key.compareTo(middleKey) == 0)</b>
+<b class="fc"><i>264</i>&nbsp;                    return (T) this.values[middle];</b>
+<b class="fc"><i>265</i>&nbsp;                else if(key.compareTo(middleKey) &lt; 0)</b>
+<b class="fc"><i>266</i>&nbsp;                    right = middle;</b>
+<i>267</i>&nbsp;                else
+<b class="nc"><i>268</i>&nbsp;                    left = middle;</b>
+<b class="fc"><i>269</i>&nbsp;                middle = (left + right) / 2;</b>
+<b class="fc"><i>270</i>&nbsp;            }</b>
+<b class="nc"><i>271</i>&nbsp;            return null;</b>
+<i>272</i>&nbsp;        }
+<i>273</i>&nbsp;
+<i>274</i>&nbsp;        /**
+<i>275</i>&nbsp;         * 叶子节点插入key
+<i>276</i>&nbsp;         *
+<i>277</i>&nbsp;         * @param value
+<i>278</i>&nbsp;         * @param key
+<i>279</i>&nbsp;         */
+<i>280</i>&nbsp;        @Override
+<i>281</i>&nbsp;        ParentNode&lt;K, T&gt; insert(K key, T value) {
+<b class="fc"><i>282</i>&nbsp;            K oldKey = null;</b>
+<i>283</i>&nbsp;            //已存在了节点，其父节点的key值
+<b class="fc"><i>284</i>&nbsp;            if(this.number &gt; 0){</b>
+<b class="fc"><i>285</i>&nbsp;                oldKey = (K) this.keys[this.number - 1];</b>
+<i>286</i>&nbsp;            }
+<i>287</i>&nbsp;            //先插入数据
+<b class="fc"><i>288</i>&nbsp;            int i = 0;</b>
+<i>289</i>&nbsp;            //递归做排序，获取到当前应该存放节点的位置，保证生成的树是有序的
+<b class="fc"><i>290</i>&nbsp;            while(i &lt; this.number){</b>
+<b class="fc"><i>291</i>&nbsp;                if(key.compareTo((K)this.keys[i]) &lt; 0)</b>
+<b class="fc"><i>292</i>&nbsp;                    break;</b>
+<b class="fc"><i>293</i>&nbsp;                i++;</b>
+<i>294</i>&nbsp;            }
+<i>295</i>&nbsp;
+<i>296</i>&nbsp;            //复制数组,完成添加
+<b class="fc"><i>297</i>&nbsp;            Object tempKeys[] = new Object[maxNoLeafNodeNum];</b>
+<b class="fc"><i>298</i>&nbsp;            Object tempValues[] = new Object[maxNoLeafNodeNum];</b>
+<b class="fc"><i>299</i>&nbsp;            System.arraycopy(this.keys, 0, tempKeys, 0, i);</b>
+<b class="fc"><i>300</i>&nbsp;            System.arraycopy(this.values, 0, tempValues, 0, i);</b>
+<b class="fc"><i>301</i>&nbsp;            System.arraycopy(this.keys, i, tempKeys, i + 1, this.number - i);</b>
+<b class="fc"><i>302</i>&nbsp;            System.arraycopy(this.values, i, tempValues, i + 1, this.number - i);</b>
+<b class="fc"><i>303</i>&nbsp;            tempKeys[i] = key;</b>
+<b class="fc"><i>304</i>&nbsp;            tempValues[i] = value;</b>
+<i>305</i>&nbsp;
+<b class="fc"><i>306</i>&nbsp;            this.number++;</b>
+<i>307</i>&nbsp;
+<i>308</i>&nbsp;            //判断是否需要拆分（每一个节点，最多有等同于树高度的子节点）
+<b class="fc"><i>309</i>&nbsp;            if(this.number &lt; treeHeight){</b>
+<b class="fc"><i>310</i>&nbsp;                System.arraycopy(tempKeys, 0, this.keys, 0, this.number);</b>
+<b class="fc"><i>311</i>&nbsp;                System.arraycopy(tempValues, 0, this.values, 0, this.number);</b>
+<i>312</i>&nbsp;
+<i>313</i>&nbsp;                //有可能虽然没有节点分裂，但是实际上插入的值大于了原来的最大值，所以所有父节点的边界值都要进行更新
+<b class="fc"><i>314</i>&nbsp;                ParentNode node = this;</b>
+<b class="fc"><i>315</i>&nbsp;                while (node.parent != null){</b>
+<b class="fc"><i>316</i>&nbsp;                    K tempkey = (K)node.keys[node.number - 1];</b>
+<b class="fc"><i>317</i>&nbsp;                    if(tempkey.compareTo((K)node.parent.keys[node.parent.number - 1]) &gt; 0){</b>
+<b class="nc"><i>318</i>&nbsp;                        node.parent.keys[node.parent.number - 1] = tempkey;</b>
+<b class="nc"><i>319</i>&nbsp;                        node = node.parent;</b>
+<i>320</i>&nbsp;                    } else {
+<i>321</i>&nbsp;                        break;
+<i>322</i>&nbsp;                    }
+<b class="nc"><i>323</i>&nbsp;                }</b>
+<b class="fc"><i>324</i>&nbsp;                return null;</b>
+<i>325</i>&nbsp;            }
+<i>326</i>&nbsp;
+<i>327</i>&nbsp;            //如果需要拆分,则从中间把节点拆分差不多的两部分
+<b class="fc"><i>328</i>&nbsp;            Integer middle = this.number / 2;</b>
+<i>329</i>&nbsp;
+<i>330</i>&nbsp;            //新建叶子节点,作为拆分的右半部分
+<b class="fc"><i>331</i>&nbsp;            LeafNode&lt;K, T&gt; parentNode = new LeafNode&lt;K, T&gt;();</b>
+<b class="fc"><i>332</i>&nbsp;            parentNode.number = this.number - middle;</b>
+<b class="fc"><i>333</i>&nbsp;            parentNode.parent = this.parent;</b>
+<i>334</i>&nbsp;            //如果父节点为空,则新建一个非叶子节点作为父节点,并且让拆分成功的两个叶子节点的指针指向父节点
+<b class="fc"><i>335</i>&nbsp;            if(this.parent == null) {</b>
+<b class="fc"><i>336</i>&nbsp;                NonLeafNode&lt;K, T&gt; tempNonLeafNode = new NonLeafNode&lt;&gt;();</b>
+<b class="fc"><i>337</i>&nbsp;                parentNode.parent = tempNonLeafNode;</b>
+<b class="fc"><i>338</i>&nbsp;                this.parent = tempNonLeafNode;</b>
+<b class="fc"><i>339</i>&nbsp;                oldKey = null;</b>
+<i>340</i>&nbsp;            }
+<b class="fc"><i>341</i>&nbsp;            System.arraycopy(tempKeys, middle, parentNode.keys, 0, parentNode.number);</b>
+<b class="fc"><i>342</i>&nbsp;            System.arraycopy(tempValues, middle, parentNode.values, 0, parentNode.number);</b>
+<i>343</i>&nbsp;
+<i>344</i>&nbsp;            //让原有叶子节点作为拆分的左半部分
+<b class="fc"><i>345</i>&nbsp;            this.number = middle;</b>
+<b class="fc"><i>346</i>&nbsp;            this.keys = new Object[maxNoLeafNodeNum];</b>
+<b class="fc"><i>347</i>&nbsp;            this.values = new Object[maxNoLeafNodeNum];</b>
+<b class="fc"><i>348</i>&nbsp;            System.arraycopy(tempKeys, 0, this.keys, 0, middle);</b>
+<b class="fc"><i>349</i>&nbsp;            System.arraycopy(tempValues, 0, this.values, 0, middle);</b>
+<i>350</i>&nbsp;
+<b class="fc"><i>351</i>&nbsp;            this.right = parentNode;</b>
+<b class="fc"><i>352</i>&nbsp;            parentNode.left = this;</b>
+<i>353</i>&nbsp;
+<i>354</i>&nbsp;            //叶子节点拆分成功后,需要把新生成的节点插入父节点
+<b class="fc"><i>355</i>&nbsp;            NonLeafNode&lt;K, T&gt; ParentNode = (NonLeafNode&lt;K, T&gt;)this.parent;</b>
+<b class="fc"><i>356</i>&nbsp;            return ParentNode.insertNode(this, parentNode, oldKey);</b>
+<i>357</i>&nbsp;        }
+<i>358</i>&nbsp;
+<i>359</i>&nbsp;        /**
+<i>360</i>&nbsp;         * 刷新返回叶子结点
+<i>361</i>&nbsp;         *
+<i>362</i>&nbsp;         * @return LeafNode&lt;T, V&gt;
+<i>363</i>&nbsp;         */
+<i>364</i>&nbsp;        @Override
+<i>365</i>&nbsp;        LeafNode&lt;K, T&gt; refreshLeft() {
+<b class="fc"><i>366</i>&nbsp;            if(this.number &lt;= 0){</b>
+<b class="nc"><i>367</i>&nbsp;                return null;</b>
+<i>368</i>&nbsp;            }
+<b class="fc"><i>369</i>&nbsp;            return this;</b>
+<i>370</i>&nbsp;        }
+<i>371</i>&nbsp;    }
+<i>372</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2021-03-06 10:12</div>
+</div>
+</body>
+</html>
