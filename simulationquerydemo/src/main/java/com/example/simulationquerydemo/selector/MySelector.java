@@ -247,10 +247,13 @@ public class MySelector  {
         List<ProductPO> dataList = new ArrayList<ProductPO>();
         String[] productNames = new String[]{"羽绒服","阔腿裤","T恤","大衣","短裤","篮球","足球","羽毛球","手机","电脑"};
         Random random = new Random();
+        long loadDataTimeStart =System.currentTimeMillis();
         for(int i=0;i<data;i++){
             ProductPO  productPO = new ProductPO(i,productNames[random.nextInt(productNames.length)]+i/2,"备注"+i/5,data-i/3,new Date());
             dataList.add(productPO);
         }
+        long loadDataTimeEnd =System.currentTimeMillis();
+        System.out.println("系统数据加载时间为："+(loadDataTimeEnd-loadDataTimeStart));
         System.out.println("=============================数据录入成功,当前有数据："+data + "条");
 
         System.out.println("马上为您生成动态查询条件，请稍后：");
